@@ -68,6 +68,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:v
 .photo-sections{margin-top:20px;display:flex;flex-direction:column;gap:20px}
 .photo-cat h4{font-size:13px;font-weight:600;margin-bottom:8px}
 .photo-cat h4 span{font-weight:400;color:var(--g400);font-size:11px}
+.photo-cat h4{display:flex;align-items:center;gap:8px}
+.btn-add-ph{margin-left:auto;background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;flex-shrink:0}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
 .pt{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--g200)}
 .pt img{width:100%;height:100%;object-fit:cover}
@@ -173,17 +175,31 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:v
 
     <div id="s3" class="card hidden">
       <div class="ct">&#128247; Zdj&#281;cia jachtu</div>
-      <div class="dz" id="ph-dz" onclick="document.getElementById('ph-inp').click()">
-        <div class="icon">&#128444;&#65039;</div>
-        <h3>Zaznacz wszystkie zdj&#281;cia z folderu i przeci&#261;gnij tutaj</h3>
-        <p>Panel automatycznie podzieli je na kategorie. Mo&#380;esz zmieni&#263; przypisanie ka&#380;dego zdj&#281;cia.</p>
-      </div>
-      <input type="file" id="ph-inp" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
+      <input type="file" id="ph-hero-inp" accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'hero')">
+      <input type="file" id="ph-exterior-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'exterior')">
+      <input type="file" id="ph-interior-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'interior')">
+      <input type="file" id="ph-cabins-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'cabins')">
       <div class="photo-sections">
-        <div class="photo-cat"><h4>Hero <span>(1 zdj&#281;cie &#8212; jacht na wodzie, panoramiczne)</span></h4><div class="pgrid" id="ph-hero"></div></div>
-        <div class="photo-cat"><h4>Exterior <span>(3 zdj&#281;cia &#8212; profil, rufa, detal zewn&#281;trzny)</span></h4><div class="pgrid" id="ph-exterior"></div></div>
-        <div class="photo-cat"><h4>Wn&#281;trza <span>(5&#8211;7 zdj&#281;&#263; &#8212; kokpit, salon, kuchnia)</span></h4><div class="pgrid" id="ph-interior"></div></div>
-        <div class="photo-cat"><h4>Kabiny <span>(5&#8211;7 zdj&#281;&#263; &#8212; kabiny, &#322;azienki, detale)</span></h4><div class="pgrid" id="ph-cabins"></div></div>
+        <div class="photo-cat">
+          <h4>Hero <span>(1 zdj&#281;cie &mdash; jacht na wodzie, panoramiczne)</span>
+          <button class="btn-add-ph" onclick="document.getElementById('ph-hero-inp').click()">+ Dodaj</button></h4>
+          <div class="pgrid" id="ph-hero"></div>
+        </div>
+        <div class="photo-cat">
+          <h4>Exterior <span>(3 zdj&#281;cia &mdash; profil, rufa, detal zewn&#281;trzny)</span>
+          <button class="btn-add-ph" onclick="document.getElementById('ph-exterior-inp').click()">+ Dodaj</button></h4>
+          <div class="pgrid" id="ph-exterior"></div>
+        </div>
+        <div class="photo-cat">
+          <h4>Wn&#281;trza <span>(5&ndash;7 zdj&#281;&#263; &mdash; kokpit, salon, kuchnia)</span>
+          <button class="btn-add-ph" onclick="document.getElementById('ph-interior-inp').click()">+ Dodaj</button></h4>
+          <div class="pgrid" id="ph-interior"></div>
+        </div>
+        <div class="photo-cat">
+          <h4>Kabiny <span>(5&ndash;7 zdj&#281;&#263; &mdash; kabiny, &#322;azienki, detale)</span>
+          <button class="btn-add-ph" onclick="document.getElementById('ph-cabins-inp').click()">+ Dodaj</button></h4>
+          <div class="pgrid" id="ph-cabins"></div>
+        </div>
       </div>
       <div style="margin-top:20px;display:flex;gap:10px">
         <button class="btn btn-o" onclick="goStep(2)">&#8592; Wr&#243;&#263;</button>
@@ -287,7 +303,7 @@ function resetWizard(){
   boat=null;photos={hero:[],exterior:[],interior:[],cabins:[]};pidx=0;
   document.getElementById('xls-preview').classList.add('hidden');
   document.getElementById('xls-inp').value='';
-  document.getElementById('ph-inp').value='';
+  ['ph-hero-inp','ph-exterior-inp','ph-interior-inp','ph-cabins-inp'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('client-price').value='';
   document.getElementById('gen-done').classList.add('hidden');
   document.getElementById('gen-actions').classList.remove('hidden');
@@ -336,7 +352,7 @@ function parseBoat(raw,sn){
   document.getElementById('xls-preview').classList.remove('hidden');
 }
 
-function fmtp(n){return n?Number(n).toLocaleString('pl-PL'):'&#8212;'}
+function fmtp(n){return (n&&n>0)?Number(n).toLocaleString('pl-PL'):'0'}
 
 function renderDataPreview(){
   if(!boat)return;
@@ -367,10 +383,21 @@ function updatePriceCalc(){
 }
 
 // Photo drop
-const phDz=document.getElementById('ph-dz');
-phDz.addEventListener('dragover',e=>{e.preventDefault();phDz.classList.add('over')});
-phDz.addEventListener('dragleave',()=>phDz.classList.remove('over'));
-phDz.addEventListener('drop',e=>{e.preventDefault();phDz.classList.remove('over');addPhotos(e.dataTransfer.files)});
+function addPhotosTo(files,forceCat){
+  Array.from(files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const ratio=img.width/img.height;
+        photos[forceCat].push({id:pidx++,name:f.name,data:ev.target.result,ratio,cat:forceCat});
+        renderPhotos();
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(f);
+  });
+}
 
 function addPhotos(files){
   Array.from(files).forEach(f=>{
@@ -475,9 +502,9 @@ async function generate(){
   let sy=2.3;
   [['Nr konfiguracji',nr],['Długość całkowita',boat.dl+(boat.dlft?' / '+boat.dlft:'')],['Szerokość kadłuba',boat.szer],['Zanurzenie',boat.zan],['Masa sucha',boat.masa],['Maks. osoby',boat.osob],['Paliwo',boat.pal],['Woda',boat.wod],['Kategoria',boat.kat]].forEach(([l,v])=>{
     if(!v)return;
-    s2.addText(l,{x:rx,y:sy,w:2.2,h:.26,fontSize:10,fontFace:'Arial',color:LG,margin:0});
-    s2.addText(v,{x:rx+2.2,y:sy,w:2.1,h:.26,fontSize:10,fontFace:'Arial',color:WH,bold:true,align:'right',margin:0});
-    sy+=.26;
+    s2.addText(l,{x:rx,y:sy,w:2.2,h:.26,fontSize:12,fontFace:'Arial',color:LG,margin:0});
+    s2.addText(v,{x:rx+2.2,y:sy,w:2.1,h:.26,fontSize:12,fontFace:'Arial',color:WH,bold:true,align:'right',margin:0});
+    sy+=.30;
   });
   sy+=.2;s2.addText('NAPĘD',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
   s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.1;
@@ -491,11 +518,16 @@ async function generate(){
   s3.addText('Konfiguracja nr '+nr,{x:0.6,y:1.05,w:5,h:0.42,fontSize:20,fontFace:'Arial',color:WH,bold:true,margin:0});
   s3.addImage({data:LOGO,x:5.5,y:0.38,w:1.4,h:0.4});
   const eq=boat.equip,half=Math.ceil(eq.length/2),eqL=eq.slice(0,half),eqR=eq.slice(half);
-  let ey=1.55,rH2=0.40;
-  for(let i=0;i<Math.max(eqL.length,eqR.length);i++){
+  // Oblicz rH2 dynamicznie żeby wszystko się zmieściło
+  const maxRows=Math.max(eqL.length,eqR.length);
+  const availH=11.69-1.55-0.3; // dostępna wysokość
+  const rH2=Math.min(0.42,availH/maxRows);
+  const fszEq=rH2<0.32?8:rH2<0.38?9:10;
+  let ey=1.55;
+  for(let i=0;i<maxRows;i++){
     const yy=ey+i*rH2;
-    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqL[i],{x:0.75,y:yy,w:3.3,h:.38,fontSize:10,fontFace:'Arial',color:WH,margin:0,shrinkText:true})}
-    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.3,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqR[i],{x:4.45,y:yy,w:3.3,h:.38,fontSize:10,fontFace:'Arial',color:WH,margin:0,shrinkText:true})}
+    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.08,w:.06,h:.06,fill:{color:TA}});s3.addText(eqL[i],{x:0.72,y:yy,w:3.35,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'})}
+    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.25,y:yy+0.08,w:.06,h:.06,fill:{color:TA}});s3.addText(eqR[i],{x:4.37,y:yy,w:3.35,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'})}
   }
 
   setP(58,'Slajd 4/6 &#8212; wn&#281;trza...');await tick();
@@ -504,7 +536,13 @@ async function generate(){
   s4.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
   s4.addText('Wnętrza i kokpit',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
   const int7=photos.interior.slice(0,7);
-  if(int7.length>0){let gy=1.65,g=0.12;const r1=int7.slice(0,2),r2=int7.slice(2,5),r3=int7.slice(5,7);if(r1.length){gy+=placeRow(s4,r1,gy,2.9,g)+g}if(r2.length){gy+=placeRow(s4,r2,gy,2.3,g)+g}if(r3.length)placeRow(s4,r3,gy,2.9,g)}
+  if(int7.length>0){
+    const gy0=1.65,g=0.10,totalH=11.69-gy0-0.3;
+    const rows=[int7.slice(0,2),int7.slice(2,5),int7.slice(5,7)].filter(r=>r.length>0);
+    const rH=Math.floor((totalH-(rows.length-1)*g)/rows.length*100)/100;
+    let gy=gy0;
+    rows.forEach(row=>{gy+=placeRow(s4,row,gy,rH,g)+g});
+  }
 
   setP(72,'Slajd 5/6 &#8212; kabiny...');await tick();
   const s5=pres.addSlide();s5.background={color:NAVY};
@@ -512,14 +550,20 @@ async function generate(){
   s5.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
   s5.addText('Kabiny i detale',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
   const cab7=photos.cabins.slice(0,7);
-  if(cab7.length>0){let gy=1.65,g=0.12;const r1=cab7.slice(0,2),r2=cab7.slice(2,5),r3=cab7.slice(5,7);if(r1.length){gy+=placeRow(s5,r1,gy,2.9,g)+g}if(r2.length){gy+=placeRow(s5,r2,gy,2.3,g)+g}if(r3.length)placeRow(s5,r3,gy,2.9,g)}
+  if(cab7.length>0){
+    const gy0=1.65,g=0.10,totalH=11.69-gy0-0.3;
+    const rows=[cab7.slice(0,2),cab7.slice(2,5),cab7.slice(5,7)].filter(r=>r.length>0);
+    const rH=Math.floor((totalH-(rows.length-1)*g)/rows.length*100)/100;
+    let gy=gy0;
+    rows.forEach(row=>{gy+=placeRow(s5,row,gy,rH,g)+g});
+  }
 
   setP(86,'Slajd 6/6 &#8212; podsumowanie...');await tick();
   const s6=pres.addSlide();s6.background={color:NAVY};
   s6.addText('P O D S U M O W A N I E',{x:0.6,y:0.5,w:4,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
   s6.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
   s6.addText(sh,{x:0.6,y:1.1,w:6,h:0.6,fontSize:30,fontFace:'Arial',color:WH,bold:true,margin:0});
-  s6.addText('Konfiguracja nr '+nr,{x:0.6,y:1.7,w:7,h:0.3,fontSize:10,fontFace:'Arial',color:LG,margin:0});
+  s6.addText('Konfiguracja nr '+nr,{x:0.6,y:1.7,w:7,h:0.3,fontSize:12,fontFace:'Arial',color:LG,margin:0});
   if(dost==='OD REKI'){s6.addShape(pres.shapes.ROUNDED_RECTANGLE,{x:0.6,y:2.4,w:2.8,h:.45,fill:{color:'1B6B4A'},rectRadius:.05});s6.addText('DOSTĘPNY OD RĘKI',{x:0.6,y:2.4,w:2.8,h:.45,fontSize:11,fontFace:'Arial',color:WH,bold:true,align:'center',valign:'middle',charSpacing:2})}
   s6.addShape(pres.shapes.LINE,{x:0.6,y:3.3,w:7.07,h:0,line:{color:DL,width:.5}});
   s6.addText('Cena katalogowa (Retail)',{x:0.6,y:3.7,w:4,h:.35,fontSize:12,fontFace:'Arial',color:LG,margin:0});
@@ -533,7 +577,7 @@ async function generate(){
   s6.addText(fmtp(cs)+' EUR',{x:2.0,y:5.85,w:4.27,h:.7,fontSize:40,fontFace:'Arial',color:WH,bold:true,align:'center',margin:0});
   s6.addText('Cena netto, bez VAT  |  Ex Works',{x:0.6,y:7.0,w:4,h:.25,fontSize:10,fontFace:'Arial',color:MG,margin:0});
   s6.addShape(pres.shapes.LINE,{x:0.6,y:7.6,w:7.07,h:0,line:{color:DL,width:.5}});
-  s6.addText('Masa sucha: '+boat.masa,{x:0.6,y:7.85,w:3.5,h:.25,fontSize:10,fontFace:'Arial',color:LG,margin:0});
+  s6.addText('Masa sucha: '+boat.masa,{x:0.6,y:7.85,w:3.5,h:.25,fontSize:12,fontFace:'Arial',color:LG,margin:0});
   s6.addText('Nr konfiguracji: '+nr,{x:4.2,y:7.85,w:3.5,h:.25,fontSize:10,fontFace:'Arial',color:LG,align:'right',margin:0});
   s6.addText('Silniki: '+boat.silniki,{x:0.6,y:8.15,w:7,h:.35,fontSize:10,fontFace:'Arial',color:LG,margin:0,wrap:true});
   s6.addShape(pres.shapes.LINE,{x:0.6,y:8.8,w:7.07,h:0,line:{color:DL,width:.5}});
@@ -567,7 +611,7 @@ function updateStats(){
   const a=offers.filter(o=>o.status==='aktywna');
   document.getElementById('st-active').textContent=a.length;
   document.getElementById('st-total').textContent=offers.length;
-  document.getElementById('st-val').textContent=fmtp(a.reduce((s,o)=>s+(o.cena_specjalna||0),0));
+  document.getElementById('st-val').innerHTML=fmtp(a.reduce((s,o)=>s+(o.cena_specjalna||0),0));
 }
 function showOffer(id){
   const o=offers.find(x=>x.id===id);if(!o)return;
