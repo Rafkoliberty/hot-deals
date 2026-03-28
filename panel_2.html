@@ -150,8 +150,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:v
 
     <div id="s2" class="card hidden">
       <div class="ct">&#128182; Cena dla klienta</div>
-      <div class="price-box" id="retail-box" style="display:none;background:var(--g100);border:1.5px dashed var(--teal)">
-        <label>CENA KATALOGOWA (RETAIL) EUR <span style="color:var(--teal);font-size:11px">&#9888; nie znaleziono w pliku &#8212; wpisz r&#281;cznie</span></label>
+      <div class="price-box" id="retail-box" style="background:var(--g100);border:1px solid var(--g200)">
+        <label>CENA KATALOGOWA (RETAIL) EUR <span id="retail-source" style="color:var(--teal);font-size:11px"></span></label>
         <div class="price-row">
           <input class="pi" type="number" id="retail-price" placeholder="855485" oninput="updatePriceCalc()">
           <span class="pi-sfx">EUR</span>
@@ -303,16 +303,16 @@ function switchTab(t){
 
 function goStep(n){
   if(n===2){
-    // Pokaż pole retail jeśli brak ceny z Excela
-    const retailBox=document.getElementById('retail-box');
     const retailInp=document.getElementById('retail-price');
-    if(!boat||!boat.retail||boat.retail<=0){
-      retailBox.style.display='block';
-      retailInp.value='';
+    const retailSrc=document.getElementById('retail-source');
+    if(boat&&boat.retail&&boat.retail>0){
+      retailInp.value=boat.retail;
+      if(retailSrc) retailSrc.textContent='✓ pobrano automatycznie z pliku';
     } else {
-      retailBox.style.display='none';
       retailInp.value='';
+      if(retailSrc) retailSrc.textContent='⚠ nie znaleziono — wpisz ręcznie';
     }
+    updatePriceCalc();
   }
   for(let i=1;i<=4;i++){
     document.getElementById('s'+i).classList.toggle('hidden',i!==n);
