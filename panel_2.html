@@ -176,28 +176,33 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:v
     <div id="s3" class="card hidden">
       <div class="ct">&#128247; Zdj&#281;cia jachtu</div>
       <input type="file" id="ph-hero-inp" accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'hero')">
-      <input type="file" id="ph-exterior-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'exterior')">
-      <input type="file" id="ph-interior-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'interior')">
-      <input type="file" id="ph-cabins-inp" multiple accept="image/*" style="display:none" onchange="addPhotosTo(this.files,'cabins')">
+      <input type="file" id="ph-all-inp" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
+
+      <!-- HERO: osobny przycisk -->
+      <div class="photo-cat" style="margin-bottom:16px">
+        <h4>Hero <span>(1 zdj&#281;cie &mdash; g&#322;&#243;wne zdj&#281;cie jachtu)</span>
+        <button class="btn-add-ph" onclick="document.getElementById('ph-hero-inp').click()">+ Dodaj hero</button></h4>
+        <div class="pgrid" id="ph-hero"></div>
+      </div>
+
+      <!-- RESZTA: jedno pole drag & drop -->
+      <div class="dz" id="ph-dz" onclick="document.getElementById('ph-all-inp').click()" style="margin-bottom:16px">
+        <div class="icon">&#128444;&#65039;</div>
+        <h3>Przeci&#261;gnij wszystkie zdj&#281;cia jachtu tutaj</h3>
+        <p>Panel automatycznie podzieli na: Exterior (3), Wn&#281;trza (7), Kabiny (7). Mo&#380;esz zmieni&#263; przypisanie.</p>
+      </div>
+
       <div class="photo-sections">
         <div class="photo-cat">
-          <h4>Hero <span>(1 zdj&#281;cie &mdash; jacht na wodzie, panoramiczne)</span>
-          <button class="btn-add-ph" onclick="document.getElementById('ph-hero-inp').click()">+ Dodaj</button></h4>
-          <div class="pgrid" id="ph-hero"></div>
-        </div>
-        <div class="photo-cat">
-          <h4>Exterior <span>(3 zdj&#281;cia &mdash; profil, rufa, detal zewn&#281;trzny)</span>
-          <button class="btn-add-ph" onclick="document.getElementById('ph-exterior-inp').click()">+ Dodaj</button></h4>
+          <h4>Exterior <span>(3 zdj&#281;cia)</span></h4>
           <div class="pgrid" id="ph-exterior"></div>
         </div>
         <div class="photo-cat">
-          <h4>Wn&#281;trza <span>(5&ndash;7 zdj&#281;&#263; &mdash; kokpit, salon, kuchnia)</span>
-          <button class="btn-add-ph" onclick="document.getElementById('ph-interior-inp').click()">+ Dodaj</button></h4>
+          <h4>Wn&#281;trza <span>(do 7 zdj&#281;&#263;)</span></h4>
           <div class="pgrid" id="ph-interior"></div>
         </div>
         <div class="photo-cat">
-          <h4>Kabiny <span>(5&ndash;7 zdj&#281;&#263; &mdash; kabiny, &#322;azienki, detale)</span>
-          <button class="btn-add-ph" onclick="document.getElementById('ph-cabins-inp').click()">+ Dodaj</button></h4>
+          <h4>Kabiny <span>(do 7 zdj&#281;&#263;)</span></h4>
           <div class="pgrid" id="ph-cabins"></div>
         </div>
       </div>
@@ -383,6 +388,11 @@ function updatePriceCalc(){
 }
 
 // Photo drop
+const phDz=document.getElementById('ph-dz');
+phDz.addEventListener('dragover',e=>{e.preventDefault();phDz.classList.add('over')});
+phDz.addEventListener('dragleave',()=>phDz.classList.remove('over'));
+phDz.addEventListener('drop',e=>{e.preventDefault();phDz.classList.remove('over');addPhotos(e.dataTransfer.files)});
+
 function addPhotosTo(files,forceCat){
   Array.from(files).forEach(f=>{
     const r=new FileReader();
@@ -518,16 +528,23 @@ async function generate(){
   s3.addText('Konfiguracja nr '+nr,{x:0.6,y:1.05,w:5,h:0.42,fontSize:20,fontFace:'Arial',color:WH,bold:true,margin:0});
   s3.addImage({data:LOGO,x:5.5,y:0.38,w:1.4,h:0.4});
   const eq=boat.equip,half=Math.ceil(eq.length/2),eqL=eq.slice(0,half),eqR=eq.slice(half);
-  // Oblicz rH2 dynamicznie żeby wszystko się zmieściło
   const maxRows=Math.max(eqL.length,eqR.length);
-  const availH=11.69-1.55-0.3; // dostępna wysokość
-  const rH2=Math.min(0.42,availH/maxRows);
-  const fszEq=rH2<0.32?8:rH2<0.38?9:10;
+  const availH=11.69-1.55-0.25;
+  const rH2=availH/maxRows;
+  // fontSize: 9pt fits ~0.35" row, 8pt fits ~0.30"
+  const fszEq=rH2>=0.38?10:rH2>=0.32?9:8;
+  const dotOff=Math.min(0.10,rH2*0.25);
   let ey=1.55;
   for(let i=0;i<maxRows;i++){
     const yy=ey+i*rH2;
-    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.08,w:.06,h:.06,fill:{color:TA}});s3.addText(eqL[i],{x:0.72,y:yy,w:3.35,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'})}
-    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.25,y:yy+0.08,w:.06,h:.06,fill:{color:TA}});s3.addText(eqR[i],{x:4.37,y:yy,w:3.35,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'})}
+    if(i<eqL.length){
+      s3.addShape(pres.shapes.OVAL,{x:0.58,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
+      s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
+    }
+    if(i<eqR.length){
+      s3.addShape(pres.shapes.OVAL,{x:4.22,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
+      s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
+    }
   }
 
   setP(58,'Slajd 4/6 &#8212; wn&#281;trza...');await tick();
