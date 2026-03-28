@@ -475,6 +475,36 @@ function placeRow(sl,phs,y,rH,gap){
   return ah;
 }
 
+  return null;
+}
+async function translateEquipment(items){
+  setP(5,'Tłumaczenie wyposażenia...');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{
+          role:'user',
+          content:'Przetłumacz poniższe pozycje wyposażenia jachtu z włoskiego na polski. Odpowiedz TYLKO tablicą JSON (bez żadnego tekstu przed ani po), gdzie każdy element to obiekt {"it":"oryginał","pl":"tłumaczenie"}. Tłumaczenia mają być krótkie, techniczne, branżowe.\n\n'+JSON.stringify(items)
+        }]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const arr=JSON.parse(clean);
+    const map={};
+    arr.forEach(x=>{map[x.it]=x.pl});
+    return map;
+  } catch(e) {
+    console.error('Translate error',e);
+    return {};
+  }
+}
+
 async function generate(){
   if(!boat){alert('Brak danych');return}
   const cs=parseInt(document.getElementById('client-price').value)||0;
@@ -484,6 +514,7 @@ async function generate(){
   const ck=boat.retail||0,rabK=ck-cs,rabP=ck>0?((rabK/ck)*100).toFixed(1):0;
   const dost=document.getElementById('f-dost').value,nr=boat.nr,sh=boat.sheet;
   const W=8.27,NAVY='161B33',WH='FFFFFF',LG='A0A8B8',MG='7A8299',DL='2A3050',TA='4ABFCF';
+  const equipTransl=await translateEquipment(boat.equip);
   const pres=new PptxGenJS();
   pres.defineLayout({name:'A4P',width:8.27,height:11.69});pres.layout='A4P';
 
@@ -538,12 +569,26 @@ async function generate(){
   for(let i=0;i<maxRows;i++){
     const yy=ey+i*rH2;
     if(i<eqL.length){
+      const plL=equipTransl[eqL[i]]||null;
       s3.addShape(pres.shapes.OVAL,{x:0.58,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
-      s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
+      if(plL){
+        const itH=rH2*0.55,plH=rH2*0.45;
+        s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:itH,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'bottom'});
+        s3.addText(plL,{x:0.70,y:yy+itH,w:3.4,h:plH,fontSize:Math.max(fszEq-2,7),fontFace:'Arial',color:'6B7A8D',margin:0,shrinkText:true,valign:'top',italic:true});
+      } else {
+        s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'});
+      }
     }
     if(i<eqR.length){
+      const plR=equipTransl[eqR[i]]||null;
       s3.addShape(pres.shapes.OVAL,{x:4.22,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
-      s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
+      if(plR){
+        const itH=rH2*0.55,plH=rH2*0.45;
+        s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:itH,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'bottom'});
+        s3.addText(plR,{x:4.34,y:yy+itH,w:3.4,h:plH,fontSize:Math.max(fszEq-2,7),fontFace:'Arial',color:'6B7A8D',margin:0,shrinkText:true,valign:'top',italic:true});
+      } else {
+        s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'});
+      }
     }
   }
 
