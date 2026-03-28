@@ -92,7 +92,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:v
 </head>
 <body>
 <div class="hdr">
-  <h1>LIBERTY MARINE &#8212; <span>Hot Deals</span></h1>
+  <h1>LIBERTY MARINE &mdash; <span>Hot Deals</span></h1>
   <div class="hdr-stats">
     <div><span class="sv" id="st-active">0</span>Aktywne</div>
     <div><span class="sv" id="st-total">0</span>Wszystkie</div>
@@ -473,36 +473,36 @@ async function generate(){
   s2.addText(sh,{x:rx,y:1.1,w:rw,h:0.9,fontSize:34,fontFace:'Arial',color:WH,bold:true,margin:0});
   s2.addShape(pres.shapes.LINE,{x:rx,y:2.1,w:rw,h:0,line:{color:DL,width:.5}});
   let sy=2.3;
-  [['Nr konfiguracji',nr],['Dlugosc calkowita',boat.dl+(boat.dlft?' / '+boat.dlft:'')],['Szerokosc kadluba',boat.szer],['Zanurzenie',boat.zan],['Masa sucha',boat.masa],['Maks. osoby',boat.osob],['Paliwo',boat.pal],['Woda',boat.wod],['Kategoria',boat.kat]].forEach(([l,v])=>{
+  [['Nr konfiguracji',nr],['Długość całkowita',boat.dl+(boat.dlft?' / '+boat.dlft:'')],['Szerokość kadłuba',boat.szer],['Zanurzenie',boat.zan],['Masa sucha',boat.masa],['Maks. osoby',boat.osob],['Paliwo',boat.pal],['Woda',boat.wod],['Kategoria',boat.kat]].forEach(([l,v])=>{
     if(!v)return;
     s2.addText(l,{x:rx,y:sy,w:2.2,h:.26,fontSize:10,fontFace:'Arial',color:LG,margin:0});
     s2.addText(v,{x:rx+2.2,y:sy,w:2.1,h:.26,fontSize:10,fontFace:'Arial',color:WH,bold:true,align:'right',margin:0});
     sy+=.26;
   });
-  sy+=.2;s2.addText('NAPED',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
+  sy+=.2;s2.addText('NAPĘD',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
   s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.1;
   s2.addText(boat.silniki,{x:rx,y:sy,w:rw,h:.6,fontSize:10,fontFace:'Arial',color:WH,margin:0,wrap:true});
   s2.addImage({data:LOGO,x:rx+2.8,y:10.85,w:1.4,h:0.4});
 
   setP(42,'Slajd 3/6 &#8212; wyposa&#380;enie...');await tick();
   const s3=pres.addSlide();s3.background={color:NAVY};
-  s3.addText('W Y P O S A Z E N I E',{x:0.6,y:0.5,w:5,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
+  s3.addText('W Y P O S A Ż E N I E',{x:0.6,y:0.5,w:5,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
   s3.addShape(pres.shapes.LINE,{x:0.6,y:0.9,w:1.2,h:0,line:{color:WH,width:2}});
   s3.addText('Konfiguracja nr '+nr,{x:0.6,y:1.05,w:5,h:0.42,fontSize:20,fontFace:'Arial',color:WH,bold:true,margin:0});
   s3.addImage({data:LOGO,x:5.5,y:0.38,w:1.4,h:0.4});
   const eq=boat.equip,half=Math.ceil(eq.length/2),eqL=eq.slice(0,half),eqR=eq.slice(half);
-  let ey=1.65,rH2=0.37;
+  let ey=1.55,rH2=0.40;
   for(let i=0;i<Math.max(eqL.length,eqR.length);i++){
     const yy=ey+i*rH2;
-    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqL[i],{x:0.75,y:yy,w:3.3,h:.32,fontSize:9.5,fontFace:'Arial',color:WH,margin:0})}
-    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.3,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqR[i],{x:4.45,y:yy,w:3.3,h:.32,fontSize:9.5,fontFace:'Arial',color:WH,margin:0})}
+    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqL[i],{x:0.75,y:yy,w:3.3,h:.38,fontSize:10,fontFace:'Arial',color:WH,margin:0,shrinkText:true})}
+    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.3,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqR[i],{x:4.45,y:yy,w:3.3,h:.38,fontSize:10,fontFace:'Arial',color:WH,margin:0,shrinkText:true})}
   }
 
   setP(58,'Slajd 4/6 &#8212; wn&#281;trza...');await tick();
   const s4=pres.addSlide();s4.background={color:NAVY};
   s4.addText('G A L E R I A',{x:0.6,y:0.5,w:3,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
   s4.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
-  s4.addText('Wnetrza i kokpit',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s4.addText('Wnętrza i kokpit',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
   const int7=photos.interior.slice(0,7);
   if(int7.length>0){let gy=1.65,g=0.12;const r1=int7.slice(0,2),r2=int7.slice(2,5),r3=int7.slice(5,7);if(r1.length){gy+=placeRow(s4,r1,gy,2.9,g)+g}if(r2.length){gy+=placeRow(s4,r2,gy,2.3,g)+g}if(r3.length)placeRow(s4,r3,gy,2.9,g)}
 
@@ -520,7 +520,7 @@ async function generate(){
   s6.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
   s6.addText(sh,{x:0.6,y:1.1,w:6,h:0.6,fontSize:30,fontFace:'Arial',color:WH,bold:true,margin:0});
   s6.addText('Konfiguracja nr '+nr,{x:0.6,y:1.7,w:7,h:0.3,fontSize:10,fontFace:'Arial',color:LG,margin:0});
-  if(dost==='OD REKI'){s6.addShape(pres.shapes.ROUNDED_RECTANGLE,{x:0.6,y:2.4,w:2.8,h:.45,fill:{color:'1B6B4A'},rectRadius:.05});s6.addText('DOSTEPNY OD REKI',{x:0.6,y:2.4,w:2.8,h:.45,fontSize:11,fontFace:'Arial',color:WH,bold:true,align:'center',valign:'middle',charSpacing:2})}
+  if(dost==='OD REKI'){s6.addShape(pres.shapes.ROUNDED_RECTANGLE,{x:0.6,y:2.4,w:2.8,h:.45,fill:{color:'1B6B4A'},rectRadius:.05});s6.addText('DOSTĘPNY OD RĘKI',{x:0.6,y:2.4,w:2.8,h:.45,fontSize:11,fontFace:'Arial',color:WH,bold:true,align:'center',valign:'middle',charSpacing:2})}
   s6.addShape(pres.shapes.LINE,{x:0.6,y:3.3,w:7.07,h:0,line:{color:DL,width:.5}});
   s6.addText('Cena katalogowa (Retail)',{x:0.6,y:3.7,w:4,h:.35,fontSize:12,fontFace:'Arial',color:LG,margin:0});
   s6.addText(fmtp(ck)+' EUR',{x:4.5,y:3.7,w:3.17,h:.35,fontSize:14,fontFace:'Arial',color:LG,align:'right',margin:0});
