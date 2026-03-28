@@ -590,10 +590,12 @@ async function generate(){
   sy+=.2;s2.addText('NAPĘD',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
   s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.1;
   s2.addText(boat.silniki,{x:rx,y:sy,w:rw,h:.6,fontSize:10,fontFace:'Arial',color:WH,margin:0,wrap:true});
-  sy+=.8;
-  s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.15;
+  sy+=.3;
+  s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.2;
   if(boat.desc){
-    s2.addText(boat.desc,{x:rx,y:sy,w:rw,h:2.2,fontSize:11,fontFace:'Arial',color:LG,margin:0,wrap:true,italic:true,lineSpacingMultiple:1.4});
+    // Opis zajmuje całą pozostałą przestrzeń do logo
+    const descH=10.6-sy;
+    s2.addText(boat.desc,{x:rx,y:sy,w:rw,h:descH,fontSize:12,fontFace:'Arial',color:LG,margin:0,wrap:true,italic:true,lineSpacingMultiple:1.6,valign:'top'});
   }
   s2.addImage({data:LOGO,x:rx+2.8,y:10.85,w:1.4,h:0.4});
 
@@ -616,24 +618,15 @@ async function generate(){
     if(i<eqL.length){
       const plL=equipTransl[eqL[i]]||null;
       s3.addShape(pres.shapes.OVAL,{x:0.58,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
-      if(plL){
-        const itH=rH2*0.55,plH=rH2*0.45;
-        s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:itH,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'bottom'});
-        s3.addText(plL,{x:0.70,y:yy+itH,w:3.4,h:plH,fontSize:Math.max(fszEq-2,7),fontFace:'Arial',color:'6B7A8D',margin:0,shrinkText:true,valign:'top',italic:true});
-      } else {
-        s3.addText(eqL[i],{x:0.70,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'});
-      }
+      // Pokaż tylko polskie tłumaczenie, jeśli brak - oryginał
+      const txtL=plL||eqL[i];
+      s3.addText(txtL,{x:0.70,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
     }
     if(i<eqR.length){
       const plR=equipTransl[eqR[i]]||null;
       s3.addShape(pres.shapes.OVAL,{x:4.22,y:yy+dotOff,w:.06,h:.06,fill:{color:TA}});
-      if(plR){
-        const itH=rH2*0.55,plH=rH2*0.45;
-        s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:itH,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'bottom'});
-        s3.addText(plR,{x:4.34,y:yy+itH,w:3.4,h:plH,fontSize:Math.max(fszEq-2,7),fontFace:'Arial',color:'6B7A8D',margin:0,shrinkText:true,valign:'top',italic:true});
-      } else {
-        s3.addText(eqR[i],{x:4.34,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle'});
-      }
+      const txtR=plR||eqR[i];
+      s3.addText(txtR,{x:4.34,y:yy,w:3.4,h:rH2,fontSize:fszEq,fontFace:'Arial',color:WH,margin:0,shrinkText:true,valign:'middle',wrap:true});
     }
   }
 
