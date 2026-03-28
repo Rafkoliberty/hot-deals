@@ -478,32 +478,56 @@ function placeRow(sl,phs,y,rH,gap){
   return ah;
 }
 
-async function translateEquipment(items){
-  setP(5,'Tłumaczenie wyposażenia...');
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        messages:[{
-          role:'user',
-          content:'Przetłumacz poniższe pozycje wyposażenia jachtu z włoskiego na polski. Odpowiedz TYLKO tablicą JSON (bez żadnego tekstu przed ani po), gdzie każdy element to obiekt {"it":"oryginał","pl":"tłumaczenie"}. Tłumaczenia mają być krótkie, techniczne, branżowe.\n\n'+JSON.stringify(items)
-        }]
-      })
-    });
-    const data=await resp.json();
-    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-    const clean=text.replace(/```json|```/g,'').trim();
-    const arr=JSON.parse(clean);
-    const map={};
-    arr.forEach(x=>{map[x.it]=x.pl});
-    return map;
-  } catch(e) {
-    console.error('Translate error',e);
-    return {};
-  }
+function translateEquipment(items){
+  // Słownik włoski → polski (techniczny, jachtowy)
+  const DICT=[
+    ['ACQUA: impianto microaspirazione','Instalacja ssąca wody słodkiej'],
+    ['PASSERELLA IDRAULICA A 3 STADI','Trap hydrauliczny 3-stopniowy 3m'],
+    ['Acque nere: serbatoio raccolta','Zbiornik wód czarnych'],
+    ['Pedana di rialzo in teak per postazione di guida, richiudibile','Podwyższenie sternika z teak, składane'],
+    ['ALAGGIO/VARO TENDER - KIT','Zestaw do wodowania łodzi pomocniczej'],
+    ['PILOTA AUTOMATICO','Autopilot'],
+    ['Ancora digitale Volvo Penta DPS','Kotwica cyfrowa Volvo Penta DPS'],
+    ['Ricevitore/Trasmettitore dati sistema AIS classe B','Transponder AIS klasy B'],
+    ['Antenna TV SAT/45, con cupola di bilanciamento senza decoder','Antena TV satelitarna SAT/45 z kopułą balansującą'],
+    ['Teak pozzetto','Pokład tekowy w kokpicie'],
+    ['ANTIVEGETATIVA colore nero, 2 mani (no eliche)','Farba antyroślinna czarna, 2 warstwy (bez śrub)'],
+    ['Teak: rivestimento camminamenti Trincarini laterali','Teak: pokrycie burt bocznych'],
+    ['Antivegetativa speciale PropSpeed solo eliche','Farba PropSpeed specjalna tylko na śruby'],
+    ['TV LED salone 28"','Telewizor LED salon 28"'],
+    ['Aria condizionata 30.000BTU cabine a 3 zone indipendenti con circolazione acqua,  con pompa di calore','Klimatyzacja 30 000 BTU kabiny 3 strefy z pompą ciepła'],
+    ['TV Led 24" camera prua e poppa','Telewizor LED 24" kamera dziobowa i rufowa'],
+    ['ARIA CONDIZIONATA 16.000 BTU raffrescamento pozzetto, con pompa di calore','Klimatyzacja 16 000 BTU chłodzenie kokpitu z pompą ciepła'],
+    ['V.H.F./DSC','Radio VHF/DSC'],
+    ['Bimini top prendisole prua, microforato bianco','Bimini top słoneczny dziobowy, biały mikroperforowany'],
+    ['Copia certificato CE','Kopia certyfikatu CE'],
+    ['CAPOTTINA CHIUSURA POPPA COMPLETA','Pełne zamknięcie rufy z plandeką'],
+    ['Capottina: colore alternativo allo standard','Plandeka: kolor alternatywny'],
+    ['Domotica: impianto per controllo apertura/chiusura tetto, luci, antone motore; estintori principali; controllo livello acqua; allarme acqua in sentina.  Gestione tramite plotter su cruscotto e relative applicazioni iPhone/Android.','Automatyka: sterowanie dachem, światłami, silnikami, gaśnicami, poziomem wody; aplikacja iPhone/Android'],
+    ['Copriparabordi: colore alternativo allo standard','Pokrowce odbojników: kolor alternatywny'],
+    ['ELICA PRUA con estintore automatico','Ster strumieniowy dziobowy z gaśnicą automatyczną'],
+    ['Pavimento interno in doghe di rovere','Podłoga wewnętrzna z desek dębowych'],
+    ['Faro orientabile','Reflektor obrotowy'],
+    ['Soft-Top: tela di colore alternativo allo standard','Soft-top: tkanina w kolorze alternatywnym'],
+    ['FRIGORIFERO POZZETTO','Lodówka w kokpicie'],
+    ['Tappezzeria Esterna Silvertex: colore alternativo allo standard','Tapicerka zewnętrzna Silvertex: kolor alternatywny'],
+    ['G.P.S./CHARTPLOTTER/RADAR A COLORI','GPS/Chartplotter/Radar kolorowy'],
+    ['Verniciatura (smaltatura no gelcoat).','Lakierowanie (emalia zamiast żelkotu)'],
+    ['GENERATORE 8 KW','Generator 8 kW'],
+    ['Macchina da caffè in cucina con vassoio','Ekspres do kawy w kuchni z tacą'],
+    ['11.99','Pozycja 11.99'],
+    ['OROLOGIO-BAROMETRO- TERMOIGROMETRO','Zegar / Barometr / Termohigrometr'],
+    ['Trasporto Piantedo Plant 1 Marine Test Centre','Transport do centrum testowego Piantedo'],
+    ['Oscurante completo verticale pozzetto +destro+sinistro, microforato nero (ordinabile solo con capottina)','Rolety kokpitu pionowe lewo+prawo, czarne mikroperforowane'],
+    ['Scarico, montaggio, 400 litri di gasolio prima del collaudo, collaudo e consegna al cliente finale','Rozładunek, montaż, 400l paliwa, odbiór techniczny i przekazanie klientowi'],
+    ['OSCURANTI PARABREZZA FRONTALI E LATERALI','Rolety przedniej i bocznych szyb'],
+  ];
+  const map={};
+  items.forEach(it=>{
+    const found=DICT.find(([k])=>it.toLowerCase().includes(k.toLowerCase()));
+    if(found) map[it]=found[1];
+  });
+  return map;
 }
 
 async function generate(){
@@ -515,7 +539,7 @@ async function generate(){
   const ck=boat.retail||0,rabK=ck-cs,rabP=ck>0?((rabK/ck)*100).toFixed(1):0;
   const dost=document.getElementById('f-dost').value,nr=boat.nr,sh=boat.sheet;
   const W=8.27,NAVY='161B33',WH='FFFFFF',LG='A0A8B8',MG='7A8299',DL='2A3050',TA='4ABFCF';
-  const equipTransl=await translateEquipment(boat.equip);
+  const equipTransl=translateEquipment(boat.equip);
   const pres=new PptxGenJS();
   pres.defineLayout({name:'A4P',width:8.27,height:11.69});pres.layout='A4P';
 
@@ -569,7 +593,7 @@ async function generate(){
   sy+=.8;
   s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.15;
   if(boat.desc){
-    s2.addText(boat.desc,{x:rx,y:sy,w:rw,h:1.8,fontSize:9,fontFace:'Arial',color:LG,margin:0,wrap:true,italic:true});
+    s2.addText(boat.desc,{x:rx,y:sy,w:rw,h:2.2,fontSize:11,fontFace:'Arial',color:LG,margin:0,wrap:true,italic:true,lineSpacingMultiple:1.4});
   }
   s2.addImage({data:LOGO,x:rx+2.8,y:10.85,w:1.4,h:0.4});
 
