@@ -349,6 +349,9 @@ function parseBoat(raw,sn){
     silniki:g(28,0).split('\n')[0].trim(),
     equip:[], sheet:sn
   };
+  // Opis modelu
+  const descMap={'M44':'Cranchi M44 HT to sportowy cruiser stworzony do inteligentnej żeglugi. Ikoniczny profil, eleganckie wnętrze oraz doskonałe osiągi przy niskim zużyciu paliwa. Soft-top zapewnia maksymalną ochronę kokpitu z możliwością pełnego otwarcia. Projekt: Christian Grande Studio.','M44 HT':'Cranchi M44 HT to sportowy cruiser stworzony do inteligentnej żeglugi. Ikoniczny profil, eleganckie wnętrze oraz doskonałe osiągi przy niskim zużyciu paliwa. Soft-top zapewnia maksymalną ochronę kokpitu z możliwością pełnego otwarcia. Projekt: Christian Grande Studio.'};
+  boat.desc=descMap[sn]||null;
   for(let i=29;i<Math.min(raw.length,410);i++){
     const n0=raw[i][0],n1=raw[i][1],star=raw[i][7];
     if(typeof n0==='number'&&n1&&star==='*') boat.equip.push(String(n1).split('\n')[0].trim());
@@ -482,7 +485,7 @@ async function translateEquipment(items){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-6',
         max_tokens:1000,
         messages:[{
           role:'user',
@@ -532,7 +535,22 @@ async function generate(){
 
   setP(25,'Slajd 2/6 &#8212; dane techniczne...');await tick();
   const s2=pres.addSlide();s2.background={color:NAVY};
-  if(photos.exterior.length>0){const pw=3.1,g2=0.15;photos.exterior.slice(0,3).forEach((p,i)=>{const h=pw/p.ratio;s2.addImage({data:p.data,x:0,y:i*(h+g2),w:pw,h})})}
+  // Exterior - 3 zdjęcia wypełniające lewą kolumnę (szerokość 3.1")
+  if(photos.exterior.length>0){
+    const pw=3.1,totalH=11.69,gap=0.08;
+    const exPhs=photos.exterior.slice(0,3);
+    // Oblicz sumaryczną wysokość przy danej szerokości
+    const heights=exPhs.map(p=>pw/p.ratio);
+    const totalImgH=heights.reduce((a,b)=>a+b,0)+(exPhs.length-1)*gap;
+    // Skaluj żeby wypełnić stronę
+    const sc=Math.min(1,(totalH-0.2)/totalImgH);
+    let iy=0;
+    exPhs.forEach((p,i)=>{
+      const h=(pw/p.ratio)*sc,w=pw*sc;
+      s2.addImage({data:p.data,x:0,y:iy,w,h});
+      iy+=h+gap;
+    });
+  }
   const rx=3.5,rw=4.3;
   s2.addText('D A N E   T E C H N I C Z N E',{x:rx,y:0.5,w:rw,h:0.3,fontSize:11,fontFace:'Arial',color:LG,charSpacing:2});
   s2.addShape(pres.shapes.LINE,{x:rx,y:0.9,w:0.8,h:0,line:{color:WH,width:2}});
@@ -548,6 +566,11 @@ async function generate(){
   sy+=.2;s2.addText('NAPĘD',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
   s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.1;
   s2.addText(boat.silniki,{x:rx,y:sy,w:rw,h:.6,fontSize:10,fontFace:'Arial',color:WH,margin:0,wrap:true});
+  sy+=.8;
+  s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.15;
+  if(boat.desc){
+    s2.addText(boat.desc,{x:rx,y:sy,w:rw,h:1.8,fontSize:9,fontFace:'Arial',color:LG,margin:0,wrap:true,italic:true});
+  }
   s2.addImage({data:LOGO,x:rx+2.8,y:10.85,w:1.4,h:0.4});
 
   setP(42,'Slajd 3/6 &#8212; wyposa&#380;enie...');await tick();
