@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liberty Marine — Hot Deals</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgenjs.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+:root{--navy:#161B33;--navy-mid:#2A3050;--teal:#4ABFCF;--teal-dark:#3A9FAD;--g100:#F0F2F5;--g200:#E1E5EB;--g300:#A0A8B8;--g400:#7A8299;--green:#1B6B4A;--red:#EF4444;--r:12px;--sh:0 4px 24px rgba(0,0,0,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--g100);color:var(--navy);min-height:100vh}
+.hdr{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.2)}
+.hdr h1{color:#fff;font-size:18px;font-weight:600}.hdr h1 span{color:var(--teal)}
+.hdr-stats{display:flex;gap:20px;color:var(--g300);font-size:12px;text-align:center}
+.hdr-stats .sv{color:#fff;font-weight:700;font-size:15px;display:block}
+.main{max-width:1060px;margin:0 auto;padding:24px}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:#fff;border-radius:var(--r);padding:4px;box-shadow:var(--sh)}
+.tab{padding:11px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:var(--g400);border:none;background:none;transition:.15s}
+.tab:hover{color:var(--navy);background:var(--g100)}.tab.active{background:var(--navy);color:#fff}
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:24px;margin-bottom:20px}
+.ct{font-size:15px;font-weight:600;margin-bottom:16px}
+.hidden{display:none}
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+.oc{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;cursor:pointer;transition:.2s}
+.oc:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.oc-h{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:16px 20px;color:#fff}
+.oc-h .brnd{font-size:10px;letter-spacing:2px;color:var(--g300);text-transform:uppercase}
+.oc-h .mdl{font-size:20px;font-weight:700;margin:4px 0}
+.oc-h .cnf{font-size:11px;color:var(--g300)}
+.oc-b{padding:14px 20px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--g200)}
+.row:last-child{border-bottom:none}
+.row .lb{font-size:12px;color:var(--g400)}.row .vl{font-size:13px;font-weight:600}
+.sp{color:var(--teal-dark)!important;font-size:17px!important}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.bg{background:#ECFDF5;color:var(--green)}.bb{background:#EFF6FF;color:#2563EB}.br2{background:#FEF2F2;color:var(--red)}
+.btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-dark)}
+.btn-n{background:var(--navy);color:#fff}.btn-n:hover{background:var(--navy-mid)}
+.btn-o{background:#fff;color:var(--navy);border:1.5px solid var(--g200)}.btn-o:hover{border-color:var(--teal);color:var(--teal)}
+.btn-big{font-size:16px;padding:14px 40px}
+.steps{display:flex;gap:4px;margin-bottom:24px}
+.step{flex:1;padding:10px;text-align:center;border-radius:8px;font-size:13px;font-weight:500;color:var(--g400);background:var(--g100);transition:.15s}
+.step.active{background:var(--navy);color:#fff}.step.done{background:#ECFDF5;color:var(--green)}
+.dz{border:2px dashed var(--g300);border-radius:10px;padding:36px;text-align:center;cursor:pointer;transition:.2s;background:var(--g100)}
+.dz:hover,.dz.over{border-color:var(--teal);background:#F0FDFA}
+.dz .icon{font-size:32px;margin-bottom:10px}
+.dz h3{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.dz p{font-size:12px;color:var(--g400)}
+.dp{background:var(--g100);border-radius:10px;padding:16px;margin-top:16px}
+.dp h4{font-size:12px;font-weight:600;margin-bottom:12px;color:var(--g400);text-transform:uppercase;letter-spacing:.5px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.di{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid var(--g200)}
+.di .dl{font-size:10px;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.di .dv{font-size:13px;font-weight:600}
+.di.hi{border-color:var(--teal);background:#F0FDFA}
+.di.hi .dv{color:var(--teal-dark)}
+.price-box{background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:var(--r);padding:32px;text-align:center;color:#fff;margin:20px 0}
+.price-box label{display:block;font-size:11px;letter-spacing:2px;color:var(--g300);margin-bottom:14px;text-transform:uppercase}
+.price-row{display:flex;align-items:center;justify-content:center;gap:12px}
+.pi{font-size:38px;font-weight:700;background:transparent;border:none;border-bottom:2px solid var(--teal);color:#fff;text-align:center;width:240px;outline:none;padding:4px 0}
+.pi::placeholder{color:rgba(255,255,255,.25)}
+.pi-sfx{font-size:20px;color:var(--g300)}
+.price-info{margin-top:16px;display:flex;justify-content:center;gap:32px;font-size:13px;color:var(--g300)}
+.price-info strong{color:#fff}
+.photo-sections{margin-top:20px;display:flex;flex-direction:column;gap:20px}
+.photo-cat h4{font-size:13px;font-weight:600;margin-bottom:8px}
+.photo-cat h4 span{font-weight:400;color:var(--g400);font-size:11px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.pt{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--g200)}
+.pt img{width:100%;height:100%;object-fit:cover}
+.pt .del{position:absolute;top:3px;right:3px;width:18px;height:18px;background:var(--red);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.pt select{position:absolute;bottom:0;left:0;right:0;background:rgba(22,27,51,.85);color:#fff;border:none;font-size:9px;padding:3px;width:100%}
+.eq-grid{margin-top:10px;max-height:240px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.eq{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;border:1px solid var(--teal);font-size:11px;background:#ECFDF5;color:var(--teal-dark)}
+.gen-sum{background:var(--g100);border-radius:10px;padding:16px;margin-bottom:20px}
+.prog-wrap{background:var(--g100);border-radius:10px;padding:20px;text-align:center}
+.prog-bar{width:100%;height:8px;background:var(--g200);border-radius:4px;overflow:hidden;margin:12px 0}
+.prog-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .3s}
+.prog-status{font-size:13px;color:var(--g400)}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:#fff;border-radius:var(--r);width:90%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.2)}
+.modal-h{padding:18px 24px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between}
+.modal-h h2{font-size:16px}
+.modal-b{padding:20px 24px}
+.modal-f{padding:14px 24px;border-top:1px solid var(--g200);display:flex;gap:10px;justify-content:flex-end}
+@media(max-width:700px){.og{grid-template-columns:1fr}.dg{grid-template-columns:1fr}.eq-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>LIBERTY MARINE &#8212; <span>Hot Deals</span></h1>
+  <div class="hdr-stats">
+    <div><span class="sv" id="st-active">0</span>Aktywne</div>
+    <div><span class="sv" id="st-total">0</span>Wszystkie</div>
+    <div><span class="sv" id="st-val">0</span>EUR</div>
+  </div>
+</div>
+<div class="main">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('offers')">Oferty</button>
+    <button class="tab" onclick="switchTab('new')">+ Nowa oferta</button>
+    <button class="tab" onclick="switchTab('how')">Jak&#160;u&#380;ywa&#263;</button>
+  </div>
+
+  <div id="tab-offers">
+    <div style="display:flex;gap:12px;margin-bottom:20px">
+      <input style="flex:1;padding:10px 14px;border-radius:8px;border:1.5px solid var(--g200);font-size:14px;font-family:inherit;outline:none" placeholder="Szukaj..." id="q" oninput="renderOffers()">
+      <select style="padding:10px 14px;border-radius:8px;border:1.5px solid var(--g200);font-size:13px;font-family:inherit" id="fs" onchange="renderOffers()">
+        <option value="">Wszystkie</option><option value="aktywna">Aktywne</option>
+        <option value="wyslana">Wys&#322;ane</option><option value="zakonczona">Zako&#324;czone</option>
+      </select>
+    </div>
+    <div class="og" id="og"></div>
+  </div>
+
+  <div id="tab-new" class="hidden">
+    <div class="steps">
+      <div class="step active" id="si1">1. Wczytaj Excel</div>
+      <div class="step" id="si2">2. Cena klienta</div>
+      <div class="step" id="si3">3. Zdj&#281;cia</div>
+      <div class="step" id="si4">4. Generuj</div>
+    </div>
+
+    <div id="s1" class="card">
+      <div class="ct">&#128196; Wczytaj specyfikacj&#281; Excel</div>
+      <div class="dz" id="xls-dz" onclick="document.getElementById('xls-inp').click()">
+        <div class="icon">&#128202;</div>
+        <h3>Przeci&#261;gnij plik Excel (Retail) lub kliknij</h3>
+        <p>Plik z konfiguracj&#261; jachtu .xlsx &#8212; panel sam odczyta wszystkie dane</p>
+      </div>
+      <input type="file" id="xls-inp" accept=".xlsx,.xls" style="display:none" onchange="readExcel(this.files[0])">
+      <div id="xls-preview" class="hidden">
+        <div class="dp">
+          <h4>&#9989; Dane wczytane automatycznie</h4>
+          <div class="dg" id="data-grid"></div>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">Wyposa&#380;enie w konfiguracji (<span id="eq-count">0</span> pozycji)</div>
+          <div class="eq-grid" id="eq-list"></div>
+        </div>
+        <div style="margin-top:20px"><button class="btn btn-p" onclick="goStep(2)">Dalej: Cena klienta &#8594;</button></div>
+      </div>
+    </div>
+
+    <div id="s2" class="card hidden">
+      <div class="ct">&#128182; Cena dla klienta</div>
+      <div class="price-box">
+        <label>CENA SPECJALNA DLA KLIENTA (EUR)</label>
+        <div class="price-row">
+          <input class="pi" type="number" id="client-price" placeholder="720000" oninput="updatePriceCalc()">
+          <span class="pi-sfx">EUR</span>
+        </div>
+        <div class="price-info" id="price-info"></div>
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:500;color:var(--g400);display:block;margin-bottom:8px">Dost&#281;pno&#347;&#263; jachtu</label>
+        <select id="f-dost" style="padding:10px 14px;border-radius:8px;border:1.5px solid var(--g200);font-size:14px;font-family:inherit;width:280px">
+          <option value="OD REKI">&#9989; Dost&#281;pny od r&#281;ki</option>
+          <option value="1-3 MIESIACE">1&#8211;3 miesi&#261;ce</option>
+          <option value="3-6 MIESIECY">3&#8211;6 miesi&#281;cy</option>
+          <option value="W PRODUKCJI">W produkcji</option>
+        </select>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:10px">
+        <button class="btn btn-o" onclick="goStep(1)">&#8592; Wr&#243;&#263;</button>
+        <button class="btn btn-p" onclick="goStep(3)">Dalej: Zdj&#281;cia &#8594;</button>
+      </div>
+    </div>
+
+    <div id="s3" class="card hidden">
+      <div class="ct">&#128247; Zdj&#281;cia jachtu</div>
+      <div class="dz" id="ph-dz" onclick="document.getElementById('ph-inp').click()">
+        <div class="icon">&#128444;&#65039;</div>
+        <h3>Zaznacz wszystkie zdj&#281;cia z folderu i przeci&#261;gnij tutaj</h3>
+        <p>Panel automatycznie podzieli je na kategorie. Mo&#380;esz zmieni&#263; przypisanie ka&#380;dego zdj&#281;cia.</p>
+      </div>
+      <input type="file" id="ph-inp" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
+      <div class="photo-sections">
+        <div class="photo-cat"><h4>Hero <span>(1 zdj&#281;cie &#8212; jacht na wodzie, panoramiczne)</span></h4><div class="pgrid" id="ph-hero"></div></div>
+        <div class="photo-cat"><h4>Exterior <span>(3 zdj&#281;cia &#8212; profil, rufa, detal zewn&#281;trzny)</span></h4><div class="pgrid" id="ph-exterior"></div></div>
+        <div class="photo-cat"><h4>Wn&#281;trza <span>(5&#8211;7 zdj&#281;&#263; &#8212; kokpit, salon, kuchnia)</span></h4><div class="pgrid" id="ph-interior"></div></div>
+        <div class="photo-cat"><h4>Kabiny <span>(5&#8211;7 zdj&#281;&#263; &#8212; kabiny, &#322;azienki, detale)</span></h4><div class="pgrid" id="ph-cabins"></div></div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:10px">
+        <button class="btn btn-o" onclick="goStep(2)">&#8592; Wr&#243;&#263;</button>
+        <button class="btn btn-p" onclick="goStep(4)">Dalej: Generuj &#8594;</button>
+      </div>
+    </div>
+
+    <div id="s4" class="card hidden">
+      <div class="ct">&#128640; Generuj ofert&#281;</div>
+      <div class="gen-sum" id="gen-sum"></div>
+      <div id="gen-actions" style="text-align:center;padding:12px 0">
+        <button class="btn btn-n btn-big" onclick="generate()">&#9889; Generuj PPTX i pobierz</button>
+      </div>
+      <div id="gen-prog" class="hidden prog-wrap">
+        <div class="prog-status" id="prog-txt">Przygotowywanie...</div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+      <div id="gen-done" class="hidden" style="text-align:center;padding:24px 0">
+        <div style="font-size:48px;margin-bottom:12px">&#9989;</div>
+        <h3 style="margin-bottom:8px">Oferta gotowa!</h3>
+        <p style="color:var(--g400);margin-bottom:20px">Plik PPTX pobrany. Otwórz w PowerPoint &#8594; Eksportuj &#8594; PDF</p>
+        <button class="btn btn-p" onclick="resetWizard()">+ Nowa oferta</button>
+      </div>
+      <div style="margin-top:16px"><button class="btn btn-o" onclick="goStep(3)">&#8592; Wr&#243;&#263;</button></div>
+    </div>
+  </div>
+
+  <div id="tab-how" class="hidden">
+    <div class="card">
+      <div class="ct">Jak u&#380;ywa&#263; panelu</div>
+      <div style="display:grid;gap:16px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">1</div>
+          <div><strong>Kliknij &#8222;+ Nowa oferta&#8221; i wrzuć plik Excel</strong><p style="color:var(--g400);font-size:13px;margin-top:4px">Przeci&#261;gnij plik Retail .xlsx z folderu &#322;&#243;dki na Google Drive. Panel automatycznie wczyta: dane techniczne, cen&#281; cennikow&#261; i ca&#322;e wyposa&#380;enie konfiguracji.</p></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">2</div>
+          <div><strong>Wpisz tylko cen&#281; klienta</strong><p style="color:var(--g400);font-size:13px;margin-top:4px">To jedyna warto&#347;&#263; kt&#243;r&#261; wpisujesz r&#281;cznie. Panel sam oblicza rabat i procent.</p></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">3</div>
+          <div><strong>Przeci&#261;gnij zdj&#281;cia</strong><p style="color:var(--g400);font-size:13px;margin-top:4px">Zaznacz wszystkie zdj&#281;cia z folderu na Google Drive (Ctrl+A) i przeci&#261;gnij naraz. Panel podzieli je automatycznie. Mo&#380;esz zmieni&#263; przypisanie ka&#380;dego zdj&#281;cia.</p></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">4</div>
+          <div><strong>Kliknij &#8222;Generuj PPTX&#8221;</strong><p style="color:var(--g400);font-size:13px;margin-top:4px">Plik pobiera si&#281; automatycznie. Otwórz w PowerPoint &#8594; Plik &#8594; Eksportuj &#8594; PDF &#8594; gotowe.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Struktura folder&#243;w na Google Drive</div>
+      <div style="font-family:monospace;font-size:13px;line-height:2.2;background:var(--g100);padding:16px;border-radius:8px">
+        &#128193; Hot_Deals/<br>
+        &nbsp;&nbsp;&#128193; 8001_Cranchi_M44HT/<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&#128202; M_44_HT_8001_Retail.xlsx <span style="color:var(--g400)">&#8592; przeci&#261;gnij do panelu</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&#128444;&#65039; hero.jpg<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&#128444;&#65039; exterior_01.jpg &#8230; <span style="color:var(--g400)">&#8592; zaznacz wszystkie Ctrl+A i przeci&#261;gnij</span><br>
+        &nbsp;&nbsp;&#128193; 7502_Cranchi_E56/<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&#128202; E56_7502_Retail.xlsx<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&#128444;&#65039; &#8230;
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <div class="modal-h"><h2 id="modal-title"></h2><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="closeModal()">&#10005;</button></div>
+    <div class="modal-b" id="modal-body"></div>
+    <div class="modal-f" id="modal-foot"></div>
+  </div>
+</div>
+
+<script>
+const LOGO = 'data:image/png;base64,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';
+let offers = JSON.parse(localStorage.getItem('lm_offers')||'[]');
+let boat = null;
+let photos = {hero:[],exterior:[],interior:[],cabins:[]};
+let pidx = 0;
+
+function switchTab(t){
+  ['offers','new','how'].forEach((x,i)=>{
+    document.getElementById('tab-'+x).classList.toggle('hidden',x!==t);
+    document.querySelectorAll('.tab')[i].classList.toggle('active',x===t);
+  });
+  if(t==='new') resetWizard();
+}
+
+function goStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('s'+i).classList.toggle('hidden',i!==n);
+    const el=document.getElementById('si'+i);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active');
+  }
+  if(n===4) buildSummary();
+}
+
+function resetWizard(){
+  boat=null;photos={hero:[],exterior:[],interior:[],cabins:[]};pidx=0;
+  document.getElementById('xls-preview').classList.add('hidden');
+  document.getElementById('xls-inp').value='';
+  document.getElementById('ph-inp').value='';
+  document.getElementById('client-price').value='';
+  document.getElementById('gen-done').classList.add('hidden');
+  document.getElementById('gen-actions').classList.remove('hidden');
+  document.getElementById('gen-prog').classList.add('hidden');
+  ['ph-hero','ph-exterior','ph-interior','ph-cabins'].forEach(id=>document.getElementById(id).innerHTML='');
+  goStep(1);
+}
+
+// Excel drop
+const xlsDz=document.getElementById('xls-dz');
+xlsDz.addEventListener('dragover',e=>{e.preventDefault();xlsDz.classList.add('over')});
+xlsDz.addEventListener('dragleave',()=>xlsDz.classList.remove('over'));
+xlsDz.addEventListener('drop',e=>{e.preventDefault();xlsDz.classList.remove('over');if(e.dataTransfer.files[0])readExcel(e.dataTransfer.files[0])});
+
+function readExcel(file){
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const sn=wb.SheetNames[0];
+    const raw=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:null});
+    parseBoat(raw,sn);
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function parseBoat(raw,sn){
+  const g=(r,c)=>{const v=raw[r]&&raw[r][c];return v!=null?String(v).trim():''};
+  const gn=(r,c)=>{const v=raw[r]&&raw[r][c];return typeof v==='number'?v:null};
+  boat={
+    nr:g(3,2)||sn,
+    retail:gn(18,9)||gn(405,2),
+    dl:g(6,5), dlft:g(6,7),
+    lk:g(8,5).split('/')[0].trim(),
+    szer:g(10,5), zan:g(12,5), masa:g(14,5),
+    osob:g(16,5).split('/')[0].trim(),
+    pal:g(18,5), wod:g(20,5), kat:g(22,5),
+    silniki:g(28,0).split('\n')[0].trim(),
+    equip:[], sheet:sn
+  };
+  for(let i=29;i<Math.min(raw.length,410);i++){
+    const n0=raw[i][0],n1=raw[i][1],star=raw[i][7];
+    if(typeof n0==='number'&&n1&&star==='*') boat.equip.push(String(n1).split('\n')[0].trim());
+  }
+  renderDataPreview();
+  document.getElementById('xls-preview').classList.remove('hidden');
+}
+
+function fmtp(n){return n?Number(n).toLocaleString('pl-PL'):'&#8212;'}
+
+function renderDataPreview(){
+  if(!boat)return;
+  document.getElementById('data-grid').innerHTML=`
+    <div class="di"><div class="dl">Nr konfiguracji</div><div class="dv">${boat.nr}</div></div>
+    <div class="di hi"><div class="dl">Cena cennikowa (Retail)</div><div class="dv">${fmtp(boat.retail)} EUR</div></div>
+    <div class="di"><div class="dl">D&#322;ugo&#347;&#263; ca&#322;kowita</div><div class="dv">${boat.dl} / ${boat.dlft}</div></div>
+    <div class="di"><div class="dl">Szeroko&#347;&#263; kad&#322;uba</div><div class="dv">${boat.szer}</div></div>
+    <div class="di"><div class="dl">Zanurzenie</div><div class="dv">${boat.zan}</div></div>
+    <div class="di"><div class="dl">Masa sucha</div><div class="dv">${boat.masa}</div></div>
+    <div class="di"><div class="dl">Paliwo / Woda</div><div class="dv">${boat.pal} / ${boat.wod}</div></div>
+    <div class="di"><div class="dl">Kategoria proj.</div><div class="dv">${boat.kat}</div></div>
+    <div class="di" style="grid-column:1/-1"><div class="dl">Silniki</div><div class="dv" style="font-size:12px">${boat.silniki}</div></div>`;
+  document.getElementById('eq-count').textContent=boat.equip.length;
+  document.getElementById('eq-list').innerHTML=boat.equip.map(e=>`<div class="eq">&#10003; ${e}</div>`).join('');
+  updatePriceCalc();
+}
+
+function updatePriceCalc(){
+  if(!boat)return;
+  const cs=parseInt(document.getElementById('client-price').value)||0;
+  const ck=boat.retail||0;
+  if(cs>0&&ck>0){
+    const rab=ck-cs,pct=((rab/ck)*100).toFixed(1);
+    document.getElementById('price-info').innerHTML=
+      `<div>Cena cennikowa: <strong>${fmtp(ck)} EUR</strong></div><div>Rabat: <strong>${fmtp(rab)} EUR (${pct}%)</strong></div>`;
+  } else document.getElementById('price-info').innerHTML='';
+}
+
+// Photo drop
+const phDz=document.getElementById('ph-dz');
+phDz.addEventListener('dragover',e=>{e.preventDefault();phDz.classList.add('over')});
+phDz.addEventListener('dragleave',()=>phDz.classList.remove('over'));
+phDz.addEventListener('drop',e=>{e.preventDefault();phDz.classList.remove('over');addPhotos(e.dataTransfer.files)});
+
+function addPhotos(files){
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const ratio=img.width/img.height;
+        let cat='interior';
+        if(photos.hero.length===0&&ratio>1.6) cat='hero';
+        else if(ratio>1.2&&photos.exterior.length<3) cat='exterior';
+        else if(photos.interior.length>=7) cat='cabins';
+        photos[cat].push({id:pidx++,name:f.name,data:ev.target.result,ratio,cat});
+        renderPhotos();
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderPhotos(){
+  ['hero','exterior','interior','cabins'].forEach(cat=>{
+    document.getElementById('ph-'+cat).innerHTML=
+      photos[cat].map(p=>`<div class="pt"><img src="${p.data}"><button class="del" onclick="delPh(${p.id},'${cat}')">&#215;</button><select onchange="movePh(${p.id},'${cat}',this.value)">${['hero','exterior','interior','cabins'].map(c=>`<option value="${c}"${c===cat?' selected':''}>${c}</option>`).join('')}</select></div>`).join('')
+      ||'<p style="font-size:11px;color:var(--g300);padding:6px">Brak zdj&#281;&#263;</p>';
+  });
+}
+
+function delPh(id,cat){photos[cat]=photos[cat].filter(p=>p.id!==id);renderPhotos()}
+function movePh(id,from,to){
+  const idx=photos[from].findIndex(p=>p.id===id);if(idx<0)return;
+  const ph=photos[from].splice(idx,1)[0];ph.cat=to;photos[to].push(ph);renderPhotos();
+}
+
+function buildSummary(){
+  if(!boat){document.getElementById('gen-sum').innerHTML='<p style="color:var(--red)">Brak danych &#8212; wr&#243;&#263; do kroku 1.</p>';return}
+  const cs=parseInt(document.getElementById('client-price').value)||0;
+  const ck=boat.retail||0,rab=ck-cs,pct=ck>0?((rab/ck)*100).toFixed(1):0;
+  const ph=Object.values(photos).flat().length;
+  document.getElementById('gen-sum').innerHTML=`<div class="dg">
+    <div class="di"><div class="dl">Konfiguracja</div><div class="dv">#${boat.nr} &#8212; ${boat.sheet}</div></div>
+    <div class="di"><div class="dl">Cena cennikowa</div><div class="dv">${fmtp(ck)} EUR</div></div>
+    <div class="di hi"><div class="dl">Cena specjalna</div><div class="dv">${fmtp(cs)} EUR</div></div>
+    <div class="di"><div class="dl">Rabat</div><div class="dv" style="color:var(--teal-dark)">${fmtp(rab)} EUR (${pct}%)</div></div>
+    <div class="di"><div class="dl">Dost&#281;pno&#347;&#263;</div><div class="dv">${document.getElementById('f-dost').value}</div></div>
+    <div class="di"><div class="dl">Zdj&#281;cia</div><div class="dv">${ph} (hero:${photos.hero.length} ext:${photos.exterior.length} int:${photos.interior.length} kab:${photos.cabins.length})</div></div>
+  </div>`;
+}
+
+function setP(pct,txt){document.getElementById('prog-fill').style.width=pct+'%';document.getElementById('prog-txt').textContent=txt}
+function tick(){return new Promise(r=>setTimeout(r,60))}
+function fitImg(cW,cH,iR){let w,h;if(cW/cH>iR){h=cH;w=cH*iR}else{w=cW;h=cW/iR}return{w,h,ox:(cW-w)/2,oy:(cH-h)/2}}
+function placeRow(sl,phs,y,rH,gap){
+  if(!phs.length)return 0;
+  const W=8.27;
+  const sz=phs.map(p=>({d:p.data,w:rH*p.ratio,h:rH}));
+  let tw=sz.reduce((s,p)=>s+p.w,0)+(sz.length-1)*gap;
+  let sc=1;if(tw>W-0.6)sc=(W-0.6)/tw;
+  const fs=sz.map(s=>({d:s.d,w:s.w*sc,h:s.h*sc}));
+  const ftw=fs.reduce((s,p)=>s+p.w,0)+(fs.length-1)*gap;
+  let x=(W-ftw)/2;const ah=fs[0]?.h||rH;const yo=(rH-ah)/2;
+  fs.forEach(s=>{sl.addImage({data:s.d,x,y:y+yo,w:s.w,h:s.h});x+=s.w+gap});
+  return ah;
+}
+
+async function generate(){
+  if(!boat){alert('Brak danych');return}
+  const cs=parseInt(document.getElementById('client-price').value)||0;
+  if(!cs){alert('Wpisz cen&#281; klienta');return}
+  document.getElementById('gen-actions').classList.add('hidden');
+  document.getElementById('gen-prog').classList.remove('hidden');
+  const ck=boat.retail||0,rabK=ck-cs,rabP=ck>0?((rabK/ck)*100).toFixed(1):0;
+  const dost=document.getElementById('f-dost').value,nr=boat.nr,sh=boat.sheet;
+  const W=8.27,NAVY='161B33',WH='FFFFFF',LG='A0A8B8',MG='7A8299',DL='2A3050',TA='4ABFCF';
+  const pres=new PptxGenJS();
+  pres.defineLayout({name:'A4P',width:8.27,height:11.69});pres.layout='A4P';
+
+  setP(10,'Slajd 1/6 &#8212; ok&#322;adka...');await tick();
+  const s1=pres.addSlide();s1.background={color:NAVY};
+  s1.addImage({data:LOGO,x:0.55,y:0.35,w:1.5,h:0.42});
+  s1.addText('OFERTA SPECJALNA',{x:5.5,y:0.35,w:2.3,h:0.3,fontSize:10,fontFace:'Arial',color:WH,align:'right',bold:true});
+  s1.addText('Nr '+nr+' / '+new Date().getFullYear(),{x:5.5,y:0.6,w:2.3,h:0.25,fontSize:10,fontFace:'Arial',color:LG,align:'right'});
+  if(photos.hero.length>0){const hp=photos.hero[0],fit=fitImg(W,4.7,hp.ratio);s1.addImage({data:hp.data,x:fit.ox,y:1.1+fit.oy,w:fit.w,h:fit.h})}
+  s1.addText(sh,{x:0.55,y:6.0,w:5.5,h:1.0,fontSize:52,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s1.addText(boat.dl+(boat.dlft?' / '+boat.dlft:''),{x:0.55,y:6.95,w:6,h:0.35,fontSize:13,fontFace:'Arial',color:LG,margin:0});
+  s1.addShape(pres.shapes.ROUNDED_RECTANGLE,{x:0.55,y:7.7,w:4,h:1.1,fill:{color:'1E2440'},line:{color:'2E3555',width:1},rectRadius:0.05});
+  s1.addText('CENA SPECJALNA',{x:0.8,y:7.8,w:3.5,h:0.3,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});
+  s1.addText(fmtp(cs)+' EUR',{x:0.8,y:8.15,w:3.5,h:0.55,fontSize:32,fontFace:'Arial',color:WH,bold:true});
+  s1.addText('Cena netto, bez VAT  |  Ex Works',{x:0.55,y:9.1,w:4,h:0.25,fontSize:10,fontFace:'Arial',color:MG});
+  s1.addText([{text:'Rafal Majda',options:{bold:true,breakLine:true}},{text:'rafal.majda@libertymarine.pl',options:{breakLine:true}},{text:'+48 501 103 179  |  +385 95 34 97 813',options:{}}],{x:3.5,y:8.9,w:4.3,h:1,fontSize:12,fontFace:'Arial',color:LG,align:'right',lineSpacingMultiple:1.5});
+
+  setP(25,'Slajd 2/6 &#8212; dane techniczne...');await tick();
+  const s2=pres.addSlide();s2.background={color:NAVY};
+  if(photos.exterior.length>0){const pw=3.1,g2=0.15;photos.exterior.slice(0,3).forEach((p,i)=>{const h=pw/p.ratio;s2.addImage({data:p.data,x:0,y:i*(h+g2),w:pw,h})})}
+  const rx=3.5,rw=4.3;
+  s2.addText('D A N E   T E C H N I C Z N E',{x:rx,y:0.5,w:rw,h:0.3,fontSize:11,fontFace:'Arial',color:LG,charSpacing:2});
+  s2.addShape(pres.shapes.LINE,{x:rx,y:0.9,w:0.8,h:0,line:{color:WH,width:2}});
+  s2.addText(sh,{x:rx,y:1.1,w:rw,h:0.9,fontSize:34,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s2.addShape(pres.shapes.LINE,{x:rx,y:2.1,w:rw,h:0,line:{color:DL,width:.5}});
+  let sy=2.3;
+  [['Nr konfiguracji',nr],['Dlugosc calkowita',boat.dl+(boat.dlft?' / '+boat.dlft:'')],['Szerokosc kadluba',boat.szer],['Zanurzenie',boat.zan],['Masa sucha',boat.masa],['Maks. osoby',boat.osob],['Paliwo',boat.pal],['Woda',boat.wod],['Kategoria',boat.kat]].forEach(([l,v])=>{
+    if(!v)return;
+    s2.addText(l,{x:rx,y:sy,w:2.2,h:.26,fontSize:10,fontFace:'Arial',color:LG,margin:0});
+    s2.addText(v,{x:rx+2.2,y:sy,w:2.1,h:.26,fontSize:10,fontFace:'Arial',color:WH,bold:true,align:'right',margin:0});
+    sy+=.26;
+  });
+  sy+=.2;s2.addText('NAPED',{x:rx,y:sy,w:rw,h:.25,fontSize:11,fontFace:'Arial',color:WH,bold:true,charSpacing:2});sy+=.3;
+  s2.addShape(pres.shapes.LINE,{x:rx,y:sy,w:rw,h:0,line:{color:DL,width:.5}});sy+=.1;
+  s2.addText(boat.silniki,{x:rx,y:sy,w:rw,h:.6,fontSize:10,fontFace:'Arial',color:WH,margin:0,wrap:true});
+  s2.addImage({data:LOGO,x:rx+2.8,y:10.85,w:1.4,h:0.4});
+
+  setP(42,'Slajd 3/6 &#8212; wyposa&#380;enie...');await tick();
+  const s3=pres.addSlide();s3.background={color:NAVY};
+  s3.addText('W Y P O S A Z E N I E',{x:0.6,y:0.5,w:5,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
+  s3.addShape(pres.shapes.LINE,{x:0.6,y:0.9,w:1.2,h:0,line:{color:WH,width:2}});
+  s3.addText('Konfiguracja nr '+nr,{x:0.6,y:1.05,w:5,h:0.42,fontSize:20,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s3.addImage({data:LOGO,x:5.5,y:0.38,w:1.4,h:0.4});
+  const eq=boat.equip,half=Math.ceil(eq.length/2),eqL=eq.slice(0,half),eqR=eq.slice(half);
+  let ey=1.65,rH2=0.37;
+  for(let i=0;i<Math.max(eqL.length,eqR.length);i++){
+    const yy=ey+i*rH2;
+    if(i<eqL.length){s3.addShape(pres.shapes.OVAL,{x:0.6,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqL[i],{x:0.75,y:yy,w:3.3,h:.32,fontSize:9.5,fontFace:'Arial',color:WH,margin:0})}
+    if(i<eqR.length){s3.addShape(pres.shapes.OVAL,{x:4.3,y:yy+0.11,w:.07,h:.07,fill:{color:TA}});s3.addText(eqR[i],{x:4.45,y:yy,w:3.3,h:.32,fontSize:9.5,fontFace:'Arial',color:WH,margin:0})}
+  }
+
+  setP(58,'Slajd 4/6 &#8212; wn&#281;trza...');await tick();
+  const s4=pres.addSlide();s4.background={color:NAVY};
+  s4.addText('G A L E R I A',{x:0.6,y:0.5,w:3,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
+  s4.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
+  s4.addText('Wnetrza i kokpit',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
+  const int7=photos.interior.slice(0,7);
+  if(int7.length>0){let gy=1.65,g=0.12;const r1=int7.slice(0,2),r2=int7.slice(2,5),r3=int7.slice(5,7);if(r1.length){gy+=placeRow(s4,r1,gy,2.9,g)+g}if(r2.length){gy+=placeRow(s4,r2,gy,2.3,g)+g}if(r3.length)placeRow(s4,r3,gy,2.9,g)}
+
+  setP(72,'Slajd 5/6 &#8212; kabiny...');await tick();
+  const s5=pres.addSlide();s5.background={color:NAVY};
+  s5.addText('G A L E R I A',{x:0.6,y:0.5,w:3,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
+  s5.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
+  s5.addText('Kabiny i detale',{x:0.6,y:1.0,w:5,h:0.5,fontSize:22,fontFace:'Arial',color:WH,bold:true,margin:0});
+  const cab7=photos.cabins.slice(0,7);
+  if(cab7.length>0){let gy=1.65,g=0.12;const r1=cab7.slice(0,2),r2=cab7.slice(2,5),r3=cab7.slice(5,7);if(r1.length){gy+=placeRow(s5,r1,gy,2.9,g)+g}if(r2.length){gy+=placeRow(s5,r2,gy,2.3,g)+g}if(r3.length)placeRow(s5,r3,gy,2.9,g)}
+
+  setP(86,'Slajd 6/6 &#8212; podsumowanie...');await tick();
+  const s6=pres.addSlide();s6.background={color:NAVY};
+  s6.addText('P O D S U M O W A N I E',{x:0.6,y:0.5,w:4,h:0.3,fontSize:11,fontFace:'Arial',color:WH,charSpacing:2,bold:true});
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:0.85,w:1.2,h:0,line:{color:WH,width:2}});
+  s6.addText(sh,{x:0.6,y:1.1,w:6,h:0.6,fontSize:30,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s6.addText('Konfiguracja nr '+nr,{x:0.6,y:1.7,w:7,h:0.3,fontSize:10,fontFace:'Arial',color:LG,margin:0});
+  if(dost==='OD REKI'){s6.addShape(pres.shapes.ROUNDED_RECTANGLE,{x:0.6,y:2.4,w:2.8,h:.45,fill:{color:'1B6B4A'},rectRadius:.05});s6.addText('DOSTEPNY OD REKI',{x:0.6,y:2.4,w:2.8,h:.45,fontSize:11,fontFace:'Arial',color:WH,bold:true,align:'center',valign:'middle',charSpacing:2})}
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:3.3,w:7.07,h:0,line:{color:DL,width:.5}});
+  s6.addText('Cena katalogowa (Retail)',{x:0.6,y:3.7,w:4,h:.35,fontSize:12,fontFace:'Arial',color:LG,margin:0});
+  s6.addText(fmtp(ck)+' EUR',{x:4.5,y:3.7,w:3.17,h:.35,fontSize:14,fontFace:'Arial',color:LG,align:'right',margin:0});
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:4.25,w:7.07,h:0,line:{color:DL,width:.5}});
+  s6.addText('Rabat',{x:0.6,y:4.5,w:4,h:.35,fontSize:12,fontFace:'Arial',color:LG,margin:0});
+  s6.addText('-'+fmtp(rabK)+' EUR  ('+rabP+'%)',{x:4.5,y:4.5,w:3.17,h:.35,fontSize:14,fontFace:'Arial',color:TA,align:'right',bold:true,margin:0});
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:5.05,w:7.07,h:0,line:{color:DL,width:.5}});
+  s6.addShape(pres.shapes.RECTANGLE,{x:0.3,y:5.4,w:7.67,h:1.3,fill:{color:'1E2440'},line:{color:'2E3555',width:1}});
+  s6.addText('CENA SPECJALNA',{x:0.6,y:5.55,w:4,h:.3,fontSize:10,fontFace:'Arial',color:WH,bold:true,charSpacing:2,margin:0});
+  s6.addText(fmtp(cs)+' EUR',{x:2.0,y:5.85,w:4.27,h:.7,fontSize:40,fontFace:'Arial',color:WH,bold:true,align:'center',margin:0});
+  s6.addText('Cena netto, bez VAT  |  Ex Works',{x:0.6,y:7.0,w:4,h:.25,fontSize:10,fontFace:'Arial',color:MG,margin:0});
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:7.6,w:7.07,h:0,line:{color:DL,width:.5}});
+  s6.addText('Masa sucha: '+boat.masa,{x:0.6,y:7.85,w:3.5,h:.25,fontSize:10,fontFace:'Arial',color:LG,margin:0});
+  s6.addText('Nr konfiguracji: '+nr,{x:4.2,y:7.85,w:3.5,h:.25,fontSize:10,fontFace:'Arial',color:LG,align:'right',margin:0});
+  s6.addText('Silniki: '+boat.silniki,{x:0.6,y:8.15,w:7,h:.35,fontSize:10,fontFace:'Arial',color:LG,margin:0,wrap:true});
+  s6.addShape(pres.shapes.LINE,{x:0.6,y:8.8,w:7.07,h:0,line:{color:DL,width:.5}});
+  s6.addText('Kontakt',{x:0.6,y:9.0,w:3,h:.3,fontSize:14,fontFace:'Arial',color:WH,bold:true,margin:0});
+  s6.addText([{text:'Rafal Majda',options:{bold:true,breakLine:true}},{text:'rafal.majda@libertymarine.pl',options:{breakLine:true}},{text:'+48 501 103 179  |  +385 95 34 97 813',options:{}}],{x:0.6,y:9.35,w:5,h:1,fontSize:12,fontFace:'Arial',color:LG,margin:0,lineSpacingMultiple:1.5});
+  s6.addImage({data:LOGO,x:5.4,y:10.45,w:1.9,h:0.55});
+
+  setP(96,'Zapisywanie...');await tick();
+  const fname=sh+'_'+nr+'_oferta.pptx';
+  await pres.writeFile({fileName:fname});
+  const id='HD-'+new Date().getFullYear()+'-'+String(offers.length+1).padStart(3,'0');
+  offers.push({id,nr,sheet:sh,cena_katalogowa:ck,cena_specjalna:cs,rabat_procent:parseFloat(rabP),status:'aktywna',dostepnosc:dost,data:new Date().toISOString().split('T')[0],plik:fname});
+  localStorage.setItem('lm_offers',JSON.stringify(offers));
+  setP(100,'Gotowe!');await tick();
+  document.getElementById('gen-prog').classList.add('hidden');
+  document.getElementById('gen-done').classList.remove('hidden');
+  renderOffers();updateStats();
+}
+
+function renderOffers(){
+  const q=(document.getElementById('q')?.value||'').toLowerCase();
+  const fs=document.getElementById('fs')?.value||'';
+  const f=offers.filter(o=>(!q||(o.sheet+o.nr+o.id).toLowerCase().includes(q))&&(!fs||o.status===fs));
+  const g=document.getElementById('og');
+  if(!f.length){g.innerHTML='<div style="text-align:center;padding:48px;color:var(--g400);grid-column:1/-1"><div style="font-size:48px;margin-bottom:12px">&#9973;</div><h3 style="color:var(--navy);margin-bottom:8px">Brak ofert</h3><p>Kliknij &#8222;+ Nowa oferta&#8221; aby zacz&#261;&#263;</p></div>';return}
+  g.innerHTML=f.map(o=>`<div class="oc" onclick="showOffer('${o.id}')"><div class="oc-h"><div class="brnd">Liberty Marine</div><div class="mdl">${o.sheet||''}</div><div class="cnf">#${o.nr} | ${o.id} | ${o.data}</div></div><div class="oc-b"><div class="row"><span class="lb">Cena specjalna</span><span class="vl sp">${fmtp(o.cena_specjalna)} EUR</span></div><div class="row"><span class="lb">Cena cennikowa</span><span class="vl" style="text-decoration:line-through;color:var(--g400)">${fmtp(o.cena_katalogowa)} EUR</span></div><div class="row"><span class="lb">Rabat</span><span class="vl" style="color:var(--teal)">${o.rabat_procent}%</span></div><div class="row"><span class="lb">Status</span><span>${sbadge(o.status)}</span></div><div class="row"><span class="lb">Dost&#281;pno&#347;&#263;</span><span>${o.dostepnosc==='OD REKI'?'<span class="badge bg">Od r&#281;ki</span>':'<span class="badge bb">'+o.dostepnosc+'</span>'}</span></div></div></div>`).join('');
+}
+
+function sbadge(s){const m={aktywna:['bg','Aktywna'],wyslana:['bb','Wys&#322;ana'],zakonczona:['bg','Zako&#324;czona'],wygasla:['br2','Wygas&#322;a']};const[c,l]=m[s]||['bb',s];return'<span class="badge '+c+'">'+l+'</span>'}
+function updateStats(){
+  const a=offers.filter(o=>o.status==='aktywna');
+  document.getElementById('st-active').textContent=a.length;
+  document.getElementById('st-total').textContent=offers.length;
+  document.getElementById('st-val').textContent=fmtp(a.reduce((s,o)=>s+(o.cena_specjalna||0),0));
+}
+function showOffer(id){
+  const o=offers.find(x=>x.id===id);if(!o)return;
+  document.getElementById('modal-title').textContent=(o.sheet||'')+' &#8212; '+o.id;
+  document.getElementById('modal-body').innerHTML=`<div class="dg" style="margin-bottom:16px"><div class="di"><div class="dl">Nr konfiguracji</div><div class="dv">${o.nr}</div></div><div class="di"><div class="dl">Status</div><div class="dv">${sbadge(o.status)}</div></div><div class="di"><div class="dl">Cena cennikowa</div><div class="dv" style="text-decoration:line-through;color:var(--g400)">${fmtp(o.cena_katalogowa)} EUR</div></div><div class="di hi"><div class="dl">Cena specjalna</div><div class="dv">${fmtp(o.cena_specjalna)} EUR</div></div><div class="di"><div class="dl">Rabat</div><div class="dv" style="color:var(--teal-dark)">${o.rabat_procent}%</div></div><div class="di"><div class="dl">Dost&#281;pno&#347;&#263;</div><div class="dv">${o.dostepnosc}</div></div><div class="di"><div class="dl">Data</div><div class="dv">${o.data}</div></div><div class="di"><div class="dl">Plik</div><div class="dv" style="font-size:11px">${o.plik||'&#8212;'}</div></div></div>`;
+  document.getElementById('modal-foot').innerHTML=`<button class="btn btn-o" onclick="closeModal()">Zamknij</button><button class="btn btn-o" onclick="cycleStatus('${o.id}')">Zmie&#324; status</button><button class="btn btn-o" style="color:var(--red)" onclick="if(confirm('Usun&#261;&#263; ofert&#281;?')){offers=offers.filter(x=>x.id!=='${o.id}');localStorage.setItem('lm_offers',JSON.stringify(offers));renderOffers();updateStats();closeModal()}">Usu&#324;</button>`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function cycleStatus(id){
+  const o=offers.find(x=>x.id===id);
+  const st=['aktywna','wyslana','zakonczona','wygasla'];
+  o.status=st[(st.indexOf(o.status)+1)%st.length];
+  localStorage.setItem('lm_offers',JSON.stringify(offers));
+  renderOffers();updateStats();showOffer(id);
+}
+renderOffers();updateStats();
+</script>
+</body>
+</html>
