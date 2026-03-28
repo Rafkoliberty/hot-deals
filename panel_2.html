@@ -306,7 +306,7 @@ function goStep(n){
     // Pokaż pole retail jeśli brak ceny z Excela
     const retailBox=document.getElementById('retail-box');
     const retailInp=document.getElementById('retail-price');
-    if(!boat||!boat.retail){
+    if(!boat||!boat.retail||boat.retail<=0){
       retailBox.style.display='block';
       retailInp.value='';
     } else {
@@ -361,14 +361,28 @@ function parseBoat(raw,sn){
   boat={
     nr:g(3,2)||sn,
     retail:(()=>{
-      // Szukaj dynamicznie wiersza z TOTALE I.V.A.
-      for(let i=80;i<raw.length;i++){
+      // Krok 1: znajdź wiersz nagłówkowy z "Retail" - zapamiętaj kolumnę
+      let retailCol=-1, retailHeaderRow=-1;
+      for(let i=0;i<raw.length;i++){
         const row=raw[i];if(!row)continue;
-        const hasTotal=row.some(v=>v&&String(v).toUpperCase().includes('TOTALE'));
-        if(hasTotal){for(let cc=2;cc<=6;cc++){const v=row[cc];if(typeof v==='number'&&v>10000)return v;}}
+        for(let cc=0;cc<row.length;cc++){
+          const v=row[cc];
+          if(v&&String(v).toUpperCase().includes('RETAIL')&&!String(v).toUpperCase().includes('PRICE LIST')){
+            retailCol=cc; retailHeaderRow=i; break;
+          }
+        }
+        if(retailCol>=0) break;
       }
-      // Fallback: sprawdź kilka komórek gdzie bywa cena
-      return gn(405,2)||gn(406,2)||gn(404,2)||gn(403,2)||gn(18,9)||null;
+      // Krok 2: szukaj pierwszej dużej liczby w tej kolumnie poniżej nagłówka
+      if(retailCol>=0){
+        for(let i=retailHeaderRow+1;i<Math.min(retailHeaderRow+20,raw.length);i++){
+          const row=raw[i];if(!row)continue;
+          const v=row[retailCol];
+          if(typeof v==='number'&&v>10000) return v;
+        }
+      }
+      // Fallback
+      return gn(18,9)||gn(405,2)||gn(406,2)||null;
     })(),
     dl:g(6,5), dlft:g(6,7),
     lk:g(8,5).split('/')[0].trim(),
